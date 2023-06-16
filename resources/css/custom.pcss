@@ -23,7 +23,9 @@
                     @apply md:w-[90cqw] lg:w-[80cqw] xl:w-[60cqw] mx-auto;
 
                     & .ProseMirror {
-                        @apply h-auto min-h-full border-x;
+                        @apply h-auto min-h-full;
+                        border-left: 1px #dadde6 solid;
+                        border-right: 1px #dadde6 solid;
                         overflow: initial;
                     }
                 }
@@ -64,6 +66,16 @@
                     margin-top: 0;
                     margin-right: 2.5px;
                     border-radius: 4px;
+                }
+            }
+        }
+
+        &.toastui-editor-dark.toastui-full-screen {
+            & .toastui-editor-md-mode .toastui-editor-md-container.toastui-editor-md-tab-style,
+            & .toastui-editor-ww-mode .toastui-editor-ww-container {
+                & .toastui-editor .ProseMirror {
+                    border-left: 1px solid #393b42;
+                    border-right: 1px solid #393b42;
                 }
             }
         }
