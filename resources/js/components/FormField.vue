@@ -10,7 +10,10 @@
             <Editor
                 ref="toastUiEditor"
                 :value="value"
+                :lyhty-enhanced="field.lyhtyEnhanced"
+                v-bind="field.editor"
                 @input="handleChange"
+                @add-image="handleFileAdded"
             />
         </template>
     </DefaultField>
@@ -21,15 +24,30 @@ import Editor from './Editor.vue'
 import { FormField, HandlesValidationErrors, HandlesFieldAttachments } from 'laravel-nova'
 
 export default {
-    mixins: [FormField, HandlesValidationErrors, HandlesFieldAttachments],
+    emits: ['field-changed'],
+
+    mixins: [HandlesValidationErrors, HandlesFieldAttachments, FormField],
+
     components: {
         Editor
     },
+
+    mounted() {
+        Nova.$on(this.fieldAttributeValueEventName, this.listenToValueChanges)
+    },
+
+    beforeUnmount() {
+        Nova.$off(this.fieldAttributeValueEventName, this.listenToValueChanges)
+
+        this.clearAttachments()
+    },
+
     computed: {
         decodedFieldValue() {
             return this.decodeEntities(this.field.value ?? '');
         },
     },
+
     methods: {
         decodeEntities(value) {
             value = value.replace(/%7B/g, '{');
@@ -42,11 +60,16 @@ export default {
         },
 
         fill(formData) {
-            formData.append(this.field.attribute, this.value || '');
+            this.fillIfVisible(formData, this.fieldAttribute, this.value || '')
+            this.fillAttachmentDraftId(formData)
         },
 
         handleChange(value) {
             this.value = value;
+        },
+
+        handleFileAdded({ blob, callback }) {
+            this.uploadAttachment(blob, { onCompleted: callback })
         },
     },
 }

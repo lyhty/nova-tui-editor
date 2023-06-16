@@ -1,36 +1,70 @@
-import { Ref } from 'vue'
-import Editor from '@toast-ui/editor'
+import '@toast-ui/editor/dist/i18n/ar'
+import '@toast-ui/editor/dist/i18n/cs-cz'
+import '@toast-ui/editor/dist/i18n/de-de'
+import '@toast-ui/editor/dist/i18n/es-es'
+import '@toast-ui/editor/dist/i18n/fi-fi'
+import '@toast-ui/editor/dist/i18n/fr-fr'
+import '@toast-ui/editor/dist/i18n/gl-es'
+import '@toast-ui/editor/dist/i18n/it-it'
+import '@toast-ui/editor/dist/i18n/ja-jp'
+import '@toast-ui/editor/dist/i18n/ko-kr'
+import '@toast-ui/editor/dist/i18n/nb-no'
+import '@toast-ui/editor/dist/i18n/nl-nl'
+import '@toast-ui/editor/dist/i18n/pl-pl'
+import '@toast-ui/editor/dist/i18n/ru-ru'
+import '@toast-ui/editor/dist/i18n/sv-se'
+import '@toast-ui/editor/dist/i18n/tr-tr'
+import '@toast-ui/editor/dist/i18n/uk-ua'
+import '@toast-ui/editor/dist/i18n/zh-cn'
+import '@toast-ui/editor/dist/i18n/zh-tw'
+import '@toast-ui/editor/dist/i18n/zh-tw'
 
-import chart from '@toast-ui/editor-plugin-chart'
-import codeSyntaxHighlight from '@toast-ui/editor-plugin-code-syntax-highlight'
-import colorSyntax from '@toast-ui/editor-plugin-color-syntax'
-import tableMergedCell from '@toast-ui/editor-plugin-table-merged-cell'
-import uml from '@toast-ui/editor-plugin-uml'
+import { Ref } from 'vue'
+import Editor, { EditorType, PreviewStyle } from '@toast-ui/editor'
+import { ToolbarItemOptions } from '@toast-ui/editor/types/ui'
+import { PluginName, mapPlugins } from '../utils/plugins'
 
 export type HookCallback = (url: string, text?: string) => void
 export type AddImageBlobHook = (blob: Blob | File, callback: HookCallback) => void
-export type PluginName = 'chart' | 'codeSyntaxHighlight' | 'colorSyntax' | 'tableMergedCell' | 'uml'
 
 interface Options {
-    addImageBlobHook?: AddImageBlobHook
-    height: string
     initialValue: string
-    initialEditType: 'markdown' | 'wysiwyg'
+
+    height?: string
+    hideModeSwitch?: boolean
+    initialEditType?: EditorType
+    language?: string
     plugins?: PluginName[]
-    previewStyle: 'tab' | 'vertical'
-    onChange: (e: Editor) => void
+    previewStyle?: PreviewStyle
+    toolbarItems?: (string | ToolbarItemOptions)[][]
+    usageStatistics?: boolean
+    useCommandShortcut?: boolean
+
+    onChange?: (e: Editor) => void
+    addImageBlobHook?: AddImageBlobHook
 }
 
 export default (elRef: Ref<HTMLElement>, options: Options) => {
     const e: Editor = new Editor({
         el: elRef.value,
+
         height: options.height,
-        plugins: mapPlugins(options.plugins),
+        hideModeSwitch: options.hideModeSwitch,
         initialEditType: options.initialEditType,
-        previewStyle: options.previewStyle,
         initialValue: options.initialValue,
+        language: options.language,
+        plugins: options.plugins !== undefined
+            ? mapPlugins(options.plugins)
+            : undefined,
+        previewStyle: options.previewStyle,
+        toolbarItems: options.toolbarItems,
+        usageStatistics: options.usageStatistics,
+        useCommandShortcut: options.useCommandShortcut,
+
         events: {
-            change: () => options.onChange(e)
+            change: options.onChange
+                ? () => options.onChange(e)
+                : () => {},
         },
         hooks: {
             addImageBlobHook: options.addImageBlobHook,
@@ -40,15 +74,4 @@ export default (elRef: Ref<HTMLElement>, options: Options) => {
     return e
 }
 
-type MapPlugins = (plugins: string[]) => any[]
-const mapPlugins: MapPlugins = (plugins: string[]) => {
-    const pluginMap: { [key: string]: any } = {
-        chart,
-        codeSyntaxHighlight,
-        colorSyntax,
-        tableMergedCell,
-        uml
-    }
 
-    return plugins.map((plugin) => pluginMap[plugin])
-}

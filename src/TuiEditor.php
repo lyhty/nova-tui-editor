@@ -2,13 +2,16 @@
 
 namespace Lyhty\NovaTuiEditor;
 
+use Closure;
 use Lyhty\NovaTuiEditor\Enums\EditorType;
 use Lyhty\NovaTuiEditor\Enums\PreviewStyle;
 use Laravel\Nova\Contracts\Deletable as DeletableContract;
 use Laravel\Nova\Contracts\Storable as StorableContract;
 use Laravel\Nova\Fields\Field;
 use Laravel\Nova\Fields\HasAttachments;
-
+use Laravel\Nova\Http\Requests\NovaRequest;
+use Lyhty\NovaTuiEditor\Enums\EditorPlugin;
+use Lyhty\NovaTuiEditor\Enums\EditorToolbarItem;
 
 class TuiEditor extends Field implements StorableContract, DeletableContract
 {
@@ -28,8 +31,14 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
      */
     public $showOnIndex = false;
 
-    protected $options;
+    /**
+     * The field's options.
+     */
+    protected array $options = [];
 
+    /**
+     * Create a new field.
+     */
     public function __construct($name, $attribute = null, callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
@@ -40,24 +49,49 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
         ];
     }
 
-    public function initialEditType(EditorType $type)
+    /**
+     * Hydrate the given attribute on the model based on the incoming request.
+     *
+     * @param  \Laravel\Nova\Http\Requests\NovaRequest  $request
+     * @param  string  $requestAttribute
+     * @param  object  $model
+     * @param  string  $attribute
+     * @return void|\Closure
+     */
+    protected function fillAttribute(NovaRequest $request, $requestAttribute, $model, $attribute)
+    {
+        return $this->fillAttributeWithAttachment($request, $requestAttribute, $model, $attribute);
+    }
+
+    public function asLyhtyEnhanced($lyhtyEnhanced = true)
+    {
+        return $this->withMeta(['lyhtyEnhanced' => $lyhtyEnhanced]);
+    }
+
+    public function allowFullScreen(bool $allowFullScreen = true)
+    {
+        $this->options['allowFullScreen'] = $allowFullScreen;
+
+        return $this;
+    }
+
+    public function initialEditType(EditorType|Closure|string $type)
     {
         $this->options['initialEditType'] = $type;
 
         return $this;
     }
 
-
-    public function minHeight(string $minHeight)
+    public function previewStyle(PreviewStyle|Closure|string $style)
     {
-        $this->options['minHeight'] = $minHeight;
+        $this->options['previewStyle'] = $style;
 
         return $this;
     }
 
-    public function language(string $language)
+    public function language(?string $language)
     {
-        $this->options['language'] = $language ?? app()->getLocale();
+        $this->options['language'] = $language ?: app()->getLocale();
 
         return $this;
     }
@@ -90,25 +124,74 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
         return $this;
     }
 
-    public function previewStyle(PreviewStyle $style)
-    {
-        $this->options['previewStyle'] = $style;
-
-        return $this;
-    }
-
-    public function allowIframe(bool $allowIframe = true)
-    {
-        $this->options['allowIframe'] = $allowIframe;
-
-        return $this;
-    }
-
+    /**
+     * @param array<string|EditorPlugin> $plugins
+     */
     public function plugins(array $plugins)
     {
         $this->options['plugins'] = $plugins;
 
         return $this;
+    }
+
+    protected function resolvePreviewStyle(): ?string
+    {
+        $previewStyle = $this->options['previewStyle'] ?? null;
+
+        if ($previewStyle instanceof Closure) {
+            $previewStyle = $previewStyle();
+        }
+
+        if (is_null($previewStyle)) {
+            return null;
+        }
+
+        return $previewStyle instanceof PreviewStyle
+            ? $previewStyle->value
+            : PreviewStyle::from($previewStyle)->value;
+    }
+
+    protected function resolveInitialEditType(): ?string
+    {
+        $initialEditType = $this->options['initialEditType'] ?? null;
+
+        if ($initialEditType instanceof Closure) {
+            $initialEditType = $initialEditType();
+        }
+
+        if (is_null($initialEditType)) {
+            return null;
+        }
+
+        return $initialEditType instanceof EditorType
+            ? $initialEditType->value
+            : EditorType::from($initialEditType)->value;
+    }
+
+    /**
+     * @return string[][]
+     */
+    protected function resolveToolbarItems(): array
+    {
+        $toolbarItems = $this->options['toolbarItems'] ?? [];
+
+        $func = function (EditorToolbarItem|string $item) {
+            return is_string($item) ? $item : $item->value;
+        };
+
+        return array_map(fn (array $group) => array_map($func, $group), $toolbarItems);
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function resolvePlugins(): array
+    {
+        $plugins = $this->options['plugins'] ?? [];
+
+        return array_map(function (EditorPlugin|string $plugin) {
+            return is_string($plugin) ? $plugin : $plugin->value;
+        }, $plugins);
     }
 
     public function jsonSerialize(): array
@@ -118,9 +201,10 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
             'withFiles' => $this->withFiles,
             'editor' => [
                 ...$this->options,
-                'initialEditType' => $this->options['initialEditType']->value,
-                'previewStyle' => $this->options['previewStyle']->value,
-                'allowIframe' => $this->options['allowIframe'] === true,
+                'toolbarItems' => $this->resolveToolbarItems(),
+                'initialEditType' => $this->resolveInitialEditType(),
+                'previewStyle' => $this->resolvePreviewStyle(),
+                'plugins' => $this->resolvePlugins(),
             ],
         ];
     }

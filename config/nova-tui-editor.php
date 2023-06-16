@@ -1,51 +1,57 @@
 <?php
 
+use Lyhty\NovaTuiEditor\Enums;
+
 return [
     // If null, app()->getLocale() is used.
     'language' => null,
 
-    'initialEditType' => Lyhty\NovaTuiEditor\Enums\EditorType::WYSIWYG,
+    'initialEditType' => Enums\EditorType::WYSIWYG,
 
-    'previewStyle' => Lyhty\NovaTuiEditor\Enums\PreviewStyle::TAB,
+    'previewStyle' => Enums\PreviewStyle::TAB,
 
-    'height' => 'auto',
-    'minHeight' => '200px',
+    'height' => '500px',
 
     'useCommandShortcut' => true,
+
     'usageStatistics' => false,
 
     'hideModeSwitch' => false,
 
     'toolbarItems' => [
         [
-            'heading',
-            'bold',
-            'italic',
-            'strike',
+            Enums\EditorToolbarItem::HEADING,
+            Enums\EditorToolbarItem::BOLD,
+            Enums\EditorToolbarItem::ITALIC,
+            Enums\EditorToolbarItem::STRIKE,
         ],
         [
-            'hr',
-            'quote',
+            Enums\EditorToolbarItem::HR,
+            Enums\EditorToolbarItem::QUOTE,
         ],
         [
-            'ul',
-            'ol',
-            'task',
-            'indent',
-            'outdent',
+            Enums\EditorToolbarItem::UL,
+            Enums\EditorToolbarItem::OL,
+            Enums\EditorToolbarItem::TASK,
+            Enums\EditorToolbarItem::INDENT,
+            Enums\EditorToolbarItem::OUTDENT,
         ],
         [
-            'table',
-            'image',
-            'link',
+            Enums\EditorToolbarItem::TABLE,
+            Enums\EditorToolbarItem::IMAGE,
+            Enums\EditorToolbarItem::LINK,
         ],
         [
-            'code',
-            'codeblock',
+            Enums\EditorToolbarItem::CODE,
+            Enums\EditorToolbarItem::CODEBLOCK,
         ]
     ],
 
-    'plugins' => ['chart', 'tableMergedCell', 'uml', 'colorSyntax', 'codeSyntaxHighlight'],
-
-    'allowIframe' => false,
+    'plugins' => [
+        Enums\EditorPlugin::CHART,
+        Enums\EditorPlugin::TABLE_MERGED_CELL,
+        Enums\EditorPlugin::UML,
+        Enums\EditorPlugin::COLOR_SYNTAX,
+        Enums\EditorPlugin::CODE_SYNTAX_HIGHLIGHT,
+    ],
 ];
