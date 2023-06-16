@@ -1,0 +1,47 @@
+{
+    "name": "lyhty/nova-tui-editor",
+    "description": "A Laravel Nova field for markdown management via ToastUI editor.",
+    "keywords": [
+        "laravel",
+        "nova",
+        "field",
+        "fields",
+        "markdown",
+        "tui",
+        "toast-ui"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": ">=8.1",
+        "laravel/nova": "^4.1",
+        "nova-kit/nova-packages-tool": "^1.0.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lyhty\\NovaTuiEditor\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Lyhty\\NovaTuiEditor\\FieldServiceProvider"
+            ]
+        }
+    },
+    "script": {
+        "post-autoload-dump": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://nova.laravel.com"
+        }
+    ]
+}

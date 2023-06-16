@@ -1,0 +1,86 @@
+.nova-toastui {
+    container: tui-editor / size;
+
+    & .toastui-editor-defaultUI {
+        border: none;
+        border-radius: unset;
+        margin: 0 -0.75rem;
+
+        & .ProseMirror {
+            padding: 0.75rem;
+            height: 100%;
+        }
+
+        & .toastui-editor-defaultUI-toolbar {
+            padding: 0 0.75rem 0 25px;
+        }
+
+        & .toastui-editor-md-tab-container {
+            border-top-left-radius: 0.20rem;
+
+            & .toastui-editor-tabs {
+                margin-left: 0.75rem;
+            }
+
+            & .tab-item {
+                height: 32px;
+                margin-top: 7px;
+                margin-bottom: 7px;
+                border-radius: 4px;
+                line-height: 30px;
+                border: 1px solid #dadde6;
+
+                &:last-child {
+                    margin-left: 5px;
+                }
+            }
+        }
+
+        & .toastui-editor-mode-switch {
+            padding-right: 0.75rem;
+            display: flex !important;
+            justify-content: flex-end;
+            align-items: center;
+
+            & .tab-item {
+                width: 80px;
+                height: 20px;
+                line-height: 18px;
+                margin-top: 0;
+                margin-right: 2.5px;
+                border-radius: 4px;
+            }
+        }
+    }
+
+    & .toastui-editor-defaultUI .toastui-editor-mode-switch .tab-item,
+    & .fullscreen-button-container .fullscreen-button {
+        border: 1px solid #dadde6;
+    }
+
+    & .fullscreen-button-container {
+        @apply absolute bottom-0 left-0 flex items-center;
+        height: 28px;
+        padding-left: 0.75rem;
+
+        & .fullscreen-button {
+            color: #555;
+            height: 20px;
+            width: 20px;
+            padding: 2px;
+            border-radius: 4px;
+        }
+    }
+
+    &.toastui-editor-dark {
+        & .toastui-editor-defaultUI .toastui-editor-mode-switch .tab-item,
+        & .toastui-editor-defaultUI .toastui-editor-md-tab-container .tab-item,
+        & .fullscreen-button {
+            border: 1px solid #393b42 !important;
+        }
+
+        & .fullscreen-button-container .fullscreen-button {
+            color: #eee;
+        }
+    }
+}
