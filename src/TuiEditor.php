@@ -63,9 +63,9 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
         return $this->fillAttributeWithAttachment($request, $requestAttribute, $model, $attribute);
     }
 
-    public function asLyhtyEnhanced($lyhtyEnhanced = true)
+    public function asLyhtyEnhanced($enhanced = true)
     {
-        return $this->withMeta(['lyhtyEnhanced' => $lyhtyEnhanced]);
+        return $this->withMeta(['enhanced' => $enhanced]);
     }
 
     public function allowFullScreen(bool $allowFullScreen = true)

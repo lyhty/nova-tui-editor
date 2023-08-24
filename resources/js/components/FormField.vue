@@ -7,26 +7,48 @@
         :show-help-text="showHelpText"
       >
         <template #field>
+            <!-- @vue-ignore -->
             <Editor
                 ref="toastUiEditor"
-                :value="value"
-                :lyhty-enhanced="field.lyhtyEnhanced"
+                :model-value="value"
+                :enhanced="field.enhanced"
+                :editor-classes="{ 'form-input form-input-bordered': !fullScreen }"
                 v-bind="field.editor"
-                @input="handleChange"
+                :dark-mode="darkMode"
+                @update:model-value="handleChange"
                 @add-image="handleFileAdded"
+                @full-screen-change="fullScreen = $event"
             />
         </template>
     </DefaultField>
 </template>
 
-<script>
-import Editor from './Editor.vue'
+<script lang="ts">
+// @ts-ignore
 import { FormField, HandlesValidationErrors, HandlesFieldAttachments } from 'laravel-nova'
+import { resolveNovaDarkMode, makeObserver } from '../utils/novaDarkMode'
+import Editor from './Editor.vue'
+
+interface Data {
+    value: any
+    fullScreen: boolean
+    darkMode: boolean
+    observer: MutationObserver | null
+}
 
 export default {
     emits: ['field-changed'],
 
     mixins: [HandlesValidationErrors, HandlesFieldAttachments, FormField],
+
+    data() {
+        return <Data>{
+            value: '',
+            fullScreen: false,
+            darkMode: false,
+            observer: null,
+        }
+    },
 
     components: {
         Editor
@@ -34,12 +56,16 @@ export default {
 
     mounted() {
         Nova.$on(this.fieldAttributeValueEventName, this.listenToValueChanges)
+
+        resolveNovaDarkMode(this, 'darkMode')()
+        this.observer = makeObserver(this, 'darkMode', document.documentElement)
     },
 
     beforeUnmount() {
         Nova.$off(this.fieldAttributeValueEventName, this.listenToValueChanges)
 
         this.clearAttachments()
+        this.observer?.disconnect()
     },
 
     computed: {
@@ -49,26 +75,26 @@ export default {
     },
 
     methods: {
-        decodeEntities(value) {
+        decodeEntities(value: any): any {
             value = value.replace(/%7B/g, '{');
             value = value.replace(/%7D/g, '}');
             return value;
         },
 
-        setInitialValue() {
+        setInitialValue(): void {
             this.value = this.decodedFieldValue;
         },
 
-        fill(formData) {
+        fill(formData: any): void {
             this.fillIfVisible(formData, this.fieldAttribute, this.value || '')
             this.fillAttachmentDraftId(formData)
         },
 
-        handleChange(value) {
+        handleChange(value: any): void {
             this.value = value;
         },
 
-        handleFileAdded({ blob, callback }) {
+        handleFileAdded({ blob, callback }: { blob: any, callback: any }): void {
             this.uploadAttachment(blob, { onCompleted: callback })
         },
     },

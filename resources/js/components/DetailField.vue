@@ -4,14 +4,22 @@
             <Viewer
                 ref="viewer"
                 :style="{ marginTop }"
+                :dark-mode="darkMode"
                 :value="field.value"
             />
         </template>
     </PanelItem>
 </template>
 
-<script>
+<script lang="ts">
 import Viewer from './Viewer.vue'
+import { resolveNovaDarkMode, makeObserver } from '../utils/novaDarkMode'
+
+interface Data {
+    marginTop: string | null
+    darkMode: boolean
+    observer: MutationObserver | null
+}
 
 export default {
     props: ['index', 'resource', 'resourceName', 'resourceId', 'field'],
@@ -19,12 +27,20 @@ export default {
         Viewer
     },
     data() {
-        return {
-            marginTop: null
+        return <Data>{
+            marginTop: null,
+            darkMode: false,
+            observer: null,
         }
     },
     mounted() {
         this.$nextTick(() => this.marginTop = this.grabMarginTop())
+
+        resolveNovaDarkMode(this, 'darkMode')()
+        this.observer = makeObserver(this, 'darkMode', document.documentElement)
+    },
+    beforeUnmount() {
+        this.observer?.disconnect()
     },
     methods: {
         grabMarginTop() {
@@ -40,7 +56,7 @@ export default {
                 return null
             }
 
-            return '-' + window.getComputedStyle(child)['margin-top']
+            return '-' + window.getComputedStyle(child).getPropertyValue('margin-top')
         }
     }
 }

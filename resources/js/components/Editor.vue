@@ -5,11 +5,12 @@ import useEditor from '../composables/useEditor'
 import { PluginName } from '../utils/plugins'
 import { ToolbarItemOptions } from '@toast-ui/editor/types/ui'
 import { EditorType, PreviewStyle } from '@toast-ui/editor'
-import useNovaDarkMode from '../composables/useNovaDarkMode'
 
 interface Props {
-    lyhtyEnhanced?: boolean
-    value: string
+    enhanced?: boolean
+    editorClasses: object | string | string[]
+    darkMode?: boolean
+    modelValue: string
     allowFullScreen?: boolean
     height?: string
     hideModeSwitch?: boolean
@@ -23,7 +24,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    lyhtyEnhanced: true,
+    enhanced: true,
+    darkMode: false,
     allowFullScreen: true,
     height: '500px',
     initialEditType: 'markdown',
@@ -31,53 +33,47 @@ const props = withDefaults(defineProps<Props>(), {
     plugins: (): PluginName[] => [],
 })
 
-const emit = defineEmits(['input', 'add-image'])
+const emit = defineEmits(['update:modelValue', 'addImage', 'fullScreenChange'])
 const editor = ref(null) as Ref<HTMLDivElement | null>
 const fullScreen = ref(false) as Ref<boolean>
-
-const { darkMode, resolveNovaDarkMode, observer } = useNovaDarkMode()
 
 watch(fullScreen, (value) => {
     const cls = document.body.classList
     value ? cls.add('overflow-hidden') : cls.remove('overflow-hidden')
+
+    emit('fullScreenChange', value)
 })
 
 onMounted(() => {
-    resolveNovaDarkMode()
-    observer(document.documentElement)
-
     const e = useEditor(editor as Ref<HTMLDivElement>, {
         height: '100cqh',
         hideModeSwitch: props.hideModeSwitch,
         initialEditType: props.initialEditType,
-        initialValue: props.value,
+        initialValue: props.modelValue,
         language: props.language,
         plugins: props.plugins,
         previewStyle: props.previewStyle,
         toolbarItems: props.toolbarItems,
         usageStatistics: props.usageStatistics,
         useCommandShortcut: props.useCommandShortcut,
-        addImageBlobHook: (blob, callback): void => emit('add-image', { blob, callback }),
-        onChange: (e): void => emit('input', e.getMarkdown()),
+        addImageBlobHook: (blob, callback): void => emit('addImage', { blob, callback }),
+        onChange: (e): void => emit('update:modelValue', e.getMarkdown()),
     })
 })
 </script>
 
 <template>
     <div
-        class="nova-toastui"
+        class="tui-editor-vue3-wrapper"
         :style="{ height: !fullScreen ? height : undefined }"
         @keydown.escape="fullScreen = false"
         :class="{
-            'lyhty-enhanced': lyhtyEnhanced,
+            'tui-editor-vue3-enhanced': enhanced,
             'toastui-full-screen': fullScreen,
             'toastui-editor-dark': darkMode
         }"
     >
-        <div
-            ref="editor"
-            :class="{ 'form-input form-input-bordered': !fullScreen }"
-        />
+        <div ref="editor" :class="editorClasses" />
         <div
             class="fullscreen-button-container"
             v-if="props.allowFullScreen"
