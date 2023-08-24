@@ -7,7 +7,6 @@
         :show-help-text="showHelpText"
       >
         <template #field>
-            <!-- @vue-ignore -->
             <Editor
                 ref="toastUiEditor"
                 :model-value="value"
@@ -23,18 +22,10 @@
     </DefaultField>
 </template>
 
-<script lang="ts">
-// @ts-ignore
+<script>
 import { FormField, HandlesValidationErrors, HandlesFieldAttachments } from 'laravel-nova'
 import { resolveNovaDarkMode, makeObserver } from '../utils/novaDarkMode'
-import Editor from './Editor.vue'
-
-interface Data {
-    value: any
-    fullScreen: boolean
-    darkMode: boolean
-    observer: MutationObserver | null
-}
+import { Editor } from 'tui-editor-vue3'
 
 export default {
     emits: ['field-changed'],
@@ -42,7 +33,7 @@ export default {
     mixins: [HandlesValidationErrors, HandlesFieldAttachments, FormField],
 
     data() {
-        return <Data>{
+        return {
             value: '',
             fullScreen: false,
             darkMode: false,
@@ -75,26 +66,26 @@ export default {
     },
 
     methods: {
-        decodeEntities(value: any): any {
+        decodeEntities(value) {
             value = value.replace(/%7B/g, '{');
             value = value.replace(/%7D/g, '}');
             return value;
         },
 
-        setInitialValue(): void {
+        setInitialValue() {
             this.value = this.decodedFieldValue;
         },
 
-        fill(formData: any): void {
+        fill(formData) {
             this.fillIfVisible(formData, this.fieldAttribute, this.value || '')
             this.fillAttachmentDraftId(formData)
         },
 
-        handleChange(value: any): void {
+        handleChange(value) {
             this.value = value;
         },
 
-        handleFileAdded({ blob, callback }: { blob: any, callback: any }): void {
+        handleFileAdded({ blob, callback }) {
             this.uploadAttachment(blob, { onCompleted: callback })
         },
     },

@@ -2,7 +2,7 @@ let mix = require('laravel-mix')
 
 mix
     .setPublicPath('dist')
-    .ts('resources/js/entry.ts', 'js')
+    .ts('resources/entry.ts', 'js')
     .vue({ version: 3 })
     .webpackConfig({
         resolve: {
@@ -18,5 +18,4 @@ mix
         output: {
             uniqueName: 'lyhty/nova-tui-editor',
         }
-    })
-    .postCss('resources/css/entry.pcss', 'dist/css/');
+    });

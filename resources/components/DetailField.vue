@@ -11,15 +11,9 @@
     </PanelItem>
 </template>
 
-<script lang="ts">
-import Viewer from './Viewer.vue'
+<script>
+import { Viewer } from 'tui-editor-vue3'
 import { resolveNovaDarkMode, makeObserver } from '../utils/novaDarkMode'
-
-interface Data {
-    marginTop: string | null
-    darkMode: boolean
-    observer: MutationObserver | null
-}
 
 export default {
     props: ['index', 'resource', 'resourceName', 'resourceId', 'field'],
@@ -27,7 +21,7 @@ export default {
         Viewer
     },
     data() {
-        return <Data>{
+        return {
             marginTop: null,
             darkMode: false,
             observer: null,
