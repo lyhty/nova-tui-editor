@@ -24,6 +24,6 @@
         "vue-template-compiler": "^2.7.14"
     },
     "dependencies": {
-        "tui-editor-vue3": "^0.1.0"
+        "tui-editor-vue3": "^0.1.2"
     }
 }
