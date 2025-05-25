@@ -20,8 +20,7 @@ class FieldServiceProvider extends ServiceProvider
         ], 'config');
 
         Nova::serving(function (ServingNova $event) {
-            Nova::script('nova-tui-editor', __DIR__ . '/../dist/js/entry.js');
-            Nova::style('nova-tui-editor', __DIR__ . '/../dist/css/entry.css');
+            Nova::mix('nova-tui-editor', __DIR__.'/../dist/mix-manifest.json');
         });
     }
 

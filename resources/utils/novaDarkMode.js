@@ -1,4 +1,4 @@
-export const makeObserver = (ctx: any, attribute: string, element: HTMLElement) => {
+export const makeObserver = (ctx, attribute, element) => {
     const observer = new MutationObserver(resolveNovaDarkMode(ctx, attribute))
     observer.observe(element, {
         attributes: true,
@@ -9,7 +9,7 @@ export const makeObserver = (ctx: any, attribute: string, element: HTMLElement) 
     return observer
 }
 
-export const resolveNovaDarkMode = (ctx: any, attribute: string) => () => {
+export const resolveNovaDarkMode = (ctx, attribute) => () => {
     const cls = document.documentElement.classList
     const novaDarkModeEnabled = cls.contains('dark')
 

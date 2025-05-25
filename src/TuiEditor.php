@@ -39,7 +39,7 @@ class TuiEditor extends Field implements StorableContract, DeletableContract
     /**
      * Create a new field.
      */
-    public function __construct($name, $attribute = null, callable $resolveCallback = null)
+    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
 

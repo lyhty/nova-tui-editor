@@ -12,8 +12,8 @@
                 :model-value="value"
                 :enhanced="field.enhanced"
                 :editor-classes="{ 'form-input form-input-bordered': !fullScreen }"
-                v-bind="field.editor"
                 :dark-mode="darkMode"
+                v-bind="field.editor"
                 @update:model-value="handleChange"
                 @add-image="handleFileAdded"
                 @full-screen-change="fullScreen = $event"
@@ -32,6 +32,8 @@ export default {
 
     mixins: [HandlesValidationErrors, HandlesFieldAttachments, FormField],
 
+    props: ['resourceName', 'resourceId', 'field'],
+
     data() {
         return {
             value: '',
@@ -46,6 +48,7 @@ export default {
     },
 
     mounted() {
+        console.log('[nova-tui-editor] Mounted')
         Nova.$on(this.fieldAttributeValueEventName, this.listenToValueChanges)
 
         resolveNovaDarkMode(this, 'darkMode')()
@@ -86,7 +89,7 @@ export default {
         },
 
         handleFileAdded({ blob, callback }) {
-            this.uploadAttachment(blob, { onCompleted: callback })
+            this.uploadAttachment(blob, { onCompleted: (path, url) => callback(url) })
         },
     },
 }
